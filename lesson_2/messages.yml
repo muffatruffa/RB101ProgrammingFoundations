@@ -1,0 +1,7 @@
+en:
+  yml_welcome: "Welcome to Calculator! Enter your name:"
+  yml_valid_name: "Make sure to enter a valid name" 
+it:
+  yml_welcome: "Benvenuto nel calcolatore! Inserisci un numero:"
+  yml_valid_name: "Inserisci un nome valido" 
+
