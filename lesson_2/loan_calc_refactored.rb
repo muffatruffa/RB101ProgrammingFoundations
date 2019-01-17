@@ -13,7 +13,7 @@ def work_out_input(array)
   mounthly_payment.round(2)
 end
 
-def read_rate()
+def read_rate
   print_message(MESSAGES['ms_rate'])
   loop do
     user_input = gets.chomp.strip
@@ -32,7 +32,6 @@ def read_amount
     print_error(user_input, "er_valid_amount")
   end
 end
-
 
 def read_duration
   print_message(MESSAGES['ms_duration'])
@@ -61,7 +60,7 @@ def validate(user_input)
   )?) # The decimal point and following digits are optional
   \s*%?
   \Z}x
-  matched = float_pat.match(user_input) 
+  matched = float_pat.match(user_input)
   matched && matched[1].to_f != 0.0 && matched[1]
 end
 
@@ -79,9 +78,8 @@ loop do
 
   result = work_out_input(input_ar)
 
-  #print_message("#{MESSAGES['ms_result']}: #{result}")
   printf("%-25s $%-8.2f\n", "Amount", input_ar[0])
-  printf("%-25s %%%-8.2f\n", "Annual Rate", (input_ar[1]*100)*12)
+  printf("%-25s %%%-8.2f\n", "Annual Rate", (input_ar[1] * 100) * 12)
   printf("%-25s %-8d\n", "Duration in mounths", input_ar[2])
   printf("%-25s $%-8.2f\n", MESSAGES['ms_result'], result)
   print_message(MESSAGES["ms_end"])
