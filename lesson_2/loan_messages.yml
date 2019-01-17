@@ -1,4 +1,4 @@
-ms_welcome: "Welcome to Loan Calculator! Enter your name:"
+ms_welcome: "Welcome to Loan Calculator!"
 ms_loan: "Please enter loan amount:"
 ms_rate: "Please enter annual rate: for example 2 or 2% or 1.5"
 ms_duration: "Please enter loan duration in years:"
