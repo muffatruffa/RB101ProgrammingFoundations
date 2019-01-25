@@ -1,4 +1,4 @@
-VALID_CHOISES = %w(rock paper scissors spock lizard).freeze
+VALID_CHOICES = %w(rock paper scissors spock lizard).freeze
 WIN_COMBS = [
   %w(scissors paper),
   %w(paper rock),
@@ -18,18 +18,18 @@ game_statistics = Hash.new(0)
 
 def validate_user_input(user_input)
   case user_input
-  when /\Ar[ock]*\Z/i then VALID_CHOISES[0]
-  when /\Ap[aper]*\Z/i then VALID_CHOISES[1]
-  when /\Asp[ock]*\Z/i then VALID_CHOISES[3]
-  when /\As[cissors]*\Z/i then VALID_CHOISES[2]
-  when /\Al[izard]*\Z/i then VALID_CHOISES[4]
+  when /\Ar[ock]*\Z/i then VALID_CHOICES[0]
+  when /\Ap[aper]*\Z/i then VALID_CHOICES[1]
+  when /\Asp[ock]*\Z/i then VALID_CHOICES[3]
+  when /\As[cissors]*\Z/i then VALID_CHOICES[2]
+  when /\Al[izard]*\Z/i then VALID_CHOICES[4]
   else false
   end
 end
 
 def read_user_choice
   loop do
-    prompt("Choose one: #{VALID_CHOISES.join(', ')}")
+    prompt("Choose one: #{VALID_CHOICES.join(', ')}")
     choice = validate_user_input(gets.chomp.strip)
     return choice if choice
     prompt("that's not a valid choice'")
@@ -37,7 +37,7 @@ def read_user_choice
 end
 
 def read_computer_choice
-  VALID_CHOISES.sample
+  VALID_CHOICES.sample
 end
 
 def win_lose_tie(user_choice, computer_choice)
@@ -110,7 +110,7 @@ prompt("scissors cut paper covers rock crushes
    lizard poison spock smashes scissors
    decapitated lizard eats paper disproves
    spock vaporizes rock crushes scissors")
-prompt("You can chose one of: #{VALID_CHOISES.join(', ')}")
+prompt("You can chose one of: #{VALID_CHOICES.join(', ')}")
 prompt('You can type the entire word or use a shortened.')
 prompt('For example: l or L or liz or lizard.')
 prompt('Be aware s stands for scissors
