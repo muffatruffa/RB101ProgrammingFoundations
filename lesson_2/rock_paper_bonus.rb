@@ -27,23 +27,23 @@ def validate_user_input(user_input)
   end
 end
 
-def read_user_choise
+def read_user_choice
   loop do
     prompt("Choose one: #{VALID_CHOISES.join(', ')}")
-    choise = validate_user_input(gets.chomp.strip)
-    return choise if choise
+    choice = validate_user_input(gets.chomp.strip)
+    return choice if choice
     prompt("that's not a valid choice'")
   end
 end
 
-def read_computer_choise
+def read_computer_choice
   VALID_CHOISES.sample
 end
 
-def win_lose_tie(user_choise, computer_choise)
-  if WIN_COMBS.include?([user_choise, computer_choise])
+def win_lose_tie(user_choice, computer_choice)
+  if WIN_COMBS.include?([user_choice, computer_choice])
     :win
-  elsif user_choise == computer_choise
+  elsif user_choice == computer_choice
     :tie
   else
     :lose
@@ -51,10 +51,10 @@ def win_lose_tie(user_choise, computer_choise)
 end
 
 def play_round(game_statistics)
-  user_choise = read_user_choise
-  computer_choise = read_computer_choise
-  round_result = win_lose_tie(user_choise, computer_choise)
-  display_result(round_result, user_choise, computer_choise)
+  user_choice = read_user_choice
+  computer_choice = read_computer_choice
+  round_result = win_lose_tie(user_choice, computer_choice)
+  display_result(round_result, user_choice, computer_choice)
   game_statistics[:grand] = round_result == :win ? 'You' : 'Computer'
   game_statistics[round_result] += 1
   game_statistics[:rounds] += 1
@@ -80,9 +80,9 @@ def prompt(message)
   puts "=> #{message}"
 end
 
-def display_result(win_lose_tie, user_choise, computer_choise)
-  display_comupter = "Computer palyed: #{computer_choise}"
-  display_user = "You palyed: #{user_choise}"
+def display_result(win_lose_tie, user_choice, computer_choice)
+  display_comupter = "Computer palyed: #{computer_choice}"
+  display_user = "You palyed: #{user_choice}"
   messages = {
     win: "#{display_user}\n=> #{display_comupter}\n=> You won!",
     lose: "#{display_user}\n=> #{display_comupter}\n=> Computer won!",
@@ -116,4 +116,4 @@ prompt('For example: l or L or liz or lizard.')
 prompt('Be aware s stands for scissors
    sp or SP or spock stand for... spock obviously.')
 
-play_game(game_statistics)
+#play_game(game_statistics)

@@ -48,15 +48,15 @@ RSpec.describe "Rock Paper game" do
       it 'Breaks the loop' do 
         allow_any_instance_of(Object).to receive(:validate_user_input).and_return("sp")
         expect_any_instance_of(Object).to receive(:validate_user_input).once
-        read_user_choise
+        read_user_choice
       end
       it 'Returns spock' do
         allow_any_instance_of(Object).to receive(:gets).and_return("sp")
-        expect(read_user_choise).to eq('spock')
+        expect(read_user_choice).to eq('spock')
       end
       it 'Returns lizard' do
         allow_any_instance_of(Object).to receive(:gets).and_return("L")
-        expect(read_user_choise).to eq('lizard')
+        expect(read_user_choice).to eq('lizard')
       end     
     end
     
@@ -67,7 +67,7 @@ RSpec.describe "Rock Paper game" do
       it 'continues to loop' do 
         allow_any_instance_of(Object).to receive(:validate_user_input).and_return(false, false, true)
         expect_any_instance_of(Object).to receive(:validate_user_input).exactly(3).times
-        read_user_choise
+        read_user_choice
       end
     end
   end
@@ -141,7 +141,7 @@ RSpec.describe "Rock Paper game" do
     context 'When player win' do
       it 'update player wins statistics' do
         allow_any_instance_of(Object).to receive(:gets).and_return("L")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('paper')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('paper')
         play_round(game_statistics)
         expect(game_statistics[:win]).to eq(1)
       end
@@ -150,7 +150,7 @@ RSpec.describe "Rock Paper game" do
     context 'When palyer lose' do
       it 'update palyer losses statistics' do
         allow_any_instance_of(Object).to receive(:gets).and_return("p")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('lizard')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('lizard')
         play_round(game_statistics)
         expect(game_statistics[:lose]).to eq(1)
       end
@@ -159,7 +159,7 @@ RSpec.describe "Rock Paper game" do
     context 'When it is a tie' do
       it 'update player ties statistics' do
         allow_any_instance_of(Object).to receive(:gets).and_return("sp")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('spock')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('spock')
         play_round(game_statistics)
         expect(game_statistics[:tie]).to eq(1)        
       end
@@ -176,28 +176,28 @@ RSpec.describe "Rock Paper game" do
       it 'keeps track of rounds have been played' do
         allow_any_instance_of(Object).to receive(:play_again?).and_return(true, false)
         allow_any_instance_of(Object).to receive(:gets).and_return("L")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('paper')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('paper')
         play_game(game_statistics)
         expect(game_statistics[:rounds]).to eq(2)
       end
       it 'keeps track of wins' do
         allow_any_instance_of(Object).to receive(:play_again?).and_return(true, false)
         allow_any_instance_of(Object).to receive(:gets).and_return("L")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('paper')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('paper')
         play_game(game_statistics)
         expect(game_statistics[:win]).to eq(2)
       end
       it 'keeps track of losses' do
         allow_any_instance_of(Object).to receive(:play_again?).and_return(true, false)
         allow_any_instance_of(Object).to receive(:gets).and_return("p")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('lizard')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('lizard')
         play_game(game_statistics)
         expect(game_statistics[:lose]).to eq(2)
       end
       it 'keeps track of ties' do
         allow_any_instance_of(Object).to receive(:play_again?).and_return(true, false)
         allow_any_instance_of(Object).to receive(:gets).and_return("p")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('paper')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('paper')
         play_game(game_statistics)
         expect(game_statistics[:tie]).to eq(2)
       end
@@ -221,7 +221,7 @@ RSpec.describe "Rock Paper game" do
         #@game_statistics[:win] = 5
         allow_any_instance_of(Object).to receive(:play_again?).and_return(true, true, true, true)
         allow_any_instance_of(Object).to receive(:gets).and_return("L")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('paper')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('paper')
         #expect_any_instance_of(Object).to receive(:play_round).exactly(5).times
         play_game(@game_statistics)
         expect(@game_statistics[:win]).to eq(5)
@@ -229,14 +229,14 @@ RSpec.describe "Rock Paper game" do
       it 'Update grand player to You' do 
         allow_any_instance_of(Object).to receive(:play_again?).and_return(true, true, true, true, false)
         allow_any_instance_of(Object).to receive(:gets).and_return("L")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('paper')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('paper')
         play_game(game_statistics)
         expect(game_statistics[:grand]).to eq("You")
       end
       it 'Update grand player to Computer' do 
         allow_any_instance_of(Object).to receive(:play_again?).and_return(true, true, true, true, false)
         allow_any_instance_of(Object).to receive(:gets).and_return("P")
-        allow_any_instance_of(Object).to receive(:read_computer_choise).and_return('lizard')
+        allow_any_instance_of(Object).to receive(:read_computer_choice).and_return('lizard')
         play_game(game_statistics)
         expect(game_statistics[:grand]).to eq("Computer")
       end
