@@ -1,0 +1,37 @@
+	
+	  ____________________________________________
+	  																						 
+		Welcome in Rock Paper Scissors Spock Lizard! 
+	  ____________________________________________
+
+	  This are the rules:
+
+		- scissors cut paper 
+	  - paper covers rock 
+		- rock crushes lizard 
+		- lizard poison spock 
+		- spock smashes scissors
+		- scissors decapitated lizard
+		- lizard eats paper
+		- paper disproves spock
+		- spock vaporizes rock
+		- rock crushes scissors
+
+		______________________________________________________
+
+		To chose one  of  | You can type 
+		______________________________________________________
+										 	
+		rock             	| r, ro, roc, rock, R,... ROCK
+											|
+		scissors					| s, sc, sci, scissors, S, ...SCISSORS
+		        					|
+		paper        			| p, pa, pap, paper, P ...PAPER
+		        					|
+		lizard						| l, li, liz, liza, lizar, lizard
+											|
+		spock             | sp, spo, spock	
+		______________________________________________________
+
+
+=> Choose one: rock, paper, scissors, spock, lizard

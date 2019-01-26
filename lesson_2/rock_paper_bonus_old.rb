@@ -1,18 +1,18 @@
-require_relative './print_helpers'
-
 VALID_CHOICES = %w(rock paper scissors spock lizard).freeze
-
-WIN_COMBOS = {
-  'rock' => ['lizard', 'scissors'],
-  'paper' => ['rock', 'spock'],
-  'scissors' => ['paper', 'lizard'],
-  'spock' => ['scissors', 'rock'],
-  'lizard' => ['spock', 'paper']
-}.freeze
+WIN_COMBS = [
+  %w(scissors paper),
+  %w(paper rock),
+  %w(rock lizard),
+  %w(lizard spock),
+  %w(spock scissors),
+  %w(scissors lizard),
+  %w(lizard paper),
+  %w(paper spock),
+  %w(spock rock),
+  %w(rock scissors)
+].freeze
 
 THRESHOLD = 5
-
-CLEAR_SCREEN = 3
 
 game_statistics = Hash.new(0)
 
@@ -41,7 +41,7 @@ def read_computer_choice
 end
 
 def win_lose_tie(user_choice, computer_choice)
-  if WIN_COMBOS[user_choice].include?(computer_choice)
+  if WIN_COMBS.include?([user_choice, computer_choice])
     :win
   elsif user_choice == computer_choice
     :tie
@@ -55,10 +55,6 @@ def play_round(game_statistics)
   computer_choice = read_computer_choice
   round_result = win_lose_tie(user_choice, computer_choice)
   display_result(round_result, user_choice, computer_choice)
-  update_game_statistics(game_statistics, round_result)
-end
-
-def update_game_statistics(game_statistics, round_result)
   game_statistics[:grand] = round_result == :win ? 'You' : 'Computer'
   game_statistics[round_result] += 1
   game_statistics[:rounds] += 1
@@ -67,9 +63,8 @@ end
 def play_game(game_statistics)
   loop do
     play_round(game_statistics)
-    clear_screen(game_statistics[:rounds])
     break if grand_winner?(game_statistics)
-    prompt('Do you want to play another round?(y/n)')
+    prompt('Do you want play another round?')
     break unless play_again?
   end
   display_grand_winner(game_statistics)
@@ -86,8 +81,8 @@ def prompt(message)
 end
 
 def display_result(win_lose_tie, user_choice, computer_choice)
-  display_comupter = "Computer played: #{computer_choice}"
-  display_user = "You played: #{user_choice}"
+  display_comupter = "Computer palyed: #{computer_choice}"
+  display_user = "You palyed: #{user_choice}"
   messages = {
     win: "#{display_user}\n=> #{display_comupter}\n=> You won!",
     lose: "#{display_user}\n=> #{display_comupter}\n=> Computer won!",
@@ -109,11 +104,16 @@ def grand_winner?(game_statistics)
   THRESHOLD == game_statistics[:win] || THRESHOLD == game_statistics[:lose]
 end
 
-def clear_screen(n_rounds)
-  (n_rounds % CLEAR_SCREEN == 0) &&
-    (system('clear') || system('cls'))
-end
+prompt('Welcome in Rock Paper Scissors Spock Lizard!')
+prompt('This are the rules:')
+prompt("scissors cut paper covers rock crushes
+   lizard poison spock smashes scissors
+   decapitated lizard eats paper disproves
+   spock vaporizes rock crushes scissors")
+prompt("You can chose one of: #{VALID_CHOICES.join(', ')}")
+prompt('You can type the entire word or use a shortened.')
+prompt('For example: l or L or liz or lizard.')
+prompt('Be aware s stands for scissors
+   sp or SP or spock stand for... spock obviously.')
 
-print_intro
-
-play_game(game_statistics)
+#play_game(game_statistics)
