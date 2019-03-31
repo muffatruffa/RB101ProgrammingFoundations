@@ -5,6 +5,10 @@ COMPUTER_MARKER = 'O'
 ROW_LEN = 3
 WINNING_SCORE = 5
 FIRST_PLAYER = 'choose'
+# Please use symbol if you want set
+# FIRST_PLAYER to player or computer
+# FIRST_PLAYER = :player
+# FIRST_PLAYER = :computer
 
 # Accessing board helpers
 
