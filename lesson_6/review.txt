@@ -1,0 +1,15 @@
+
+    I recommend you also clear the screen at the beginning.
+    The prompt on who plays first can be improved. I provided "pasdasda" and it got accepted.
+    For the move, I provided 1.5 and it got accepted. I recommend not accepting this as valid.
+    The prompt on playing again can also be improved. I provided "asdsada" and it was accepted. I was expecting that only 'yand'n'` will be allowed given the prompt.
+
+
+
+
+    For production code (or code for review), I recommend that any debugging lines of code be removed. You have a commented out require 'pry'. You also have commented out lines of code (290 - 296) that you may have used for testing or as an alternative.
+    You have comments before your methods that is explaining what is going on. The general idea here is that you won't need comments if the code is readable and can explain itself. To your credit, I think you were able to do this.
+    To improve OS compatibility, I recommend you do system('clear') || system('cls').
+    Good use of methods to make the code more readable. Just a reminder, though, that using methods has the trade-off of adding an indirection. For a maintainer or reader of the code, it means that for me to understand the details of the logic. For instance, to fully understand the play_turn method there are at least 4 methods that I have to jump around the code base to process.
+    Some methods have unexpected return values given the name. For instance, it seems the return value of play_turn is already the winner of the game. I was also expecting that play_turn is just one turn. Another is the end_game_or_turn method which seems to have return value a "score". This too is unexpected given the name. If ever, this is suggestive that the method is doing more than one thing.
+    You have one variable name that I think would benefit from a question mark at the end or be renamed since it is expected to be used with conditionals: is_threat --> rewritten as threat? or is_threat?.

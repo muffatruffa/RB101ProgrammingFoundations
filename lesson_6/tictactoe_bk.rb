@@ -10,10 +10,16 @@ FIRST_PLAYER = 'choose'
 # FIRST_PLAYER = :player
 # FIRST_PLAYER = :computer
 
+# Accessing board helpers
+
 def empty_in_board(brd)
   brd.select { |_, v| v == INITIAL_MARKER }
 end
 
+# return Array of values in board
+# for a given row.
+# rows are numbered starting at zero
+# row supposed to be 0 or 1 or 2
 def values_at_row(brd, row)
   values = []
   first_square = row * ROW_LEN + 1
@@ -46,10 +52,18 @@ def values_diagonal_at_2(brd)
   values
 end
 
+# return the number of the column
+# in a bord given the square number
+# position column 0 row  0 is square 1 position column 2 row  2
+# is square 9
 def square_to_column(sqr)
   sqr % ROW_LEN == 0 ? ROW_LEN - 1 : (sqr % ROW_LEN) - 1
 end
 
+# return the number of the row
+# in a bord given the square number
+# position column 0 row  0 is square 1 position column 2 row  2
+# is square 9
 def square_to_row(sqr)
   col = square_to_column(sqr)
   (sqr - col - 1) / ROW_LEN
@@ -66,6 +80,8 @@ def winning_combs(brd)
   combs << values_diagonal_at_2(brd)
 end
 
+# Bang and setters board helpers
+
 def initialize_board
   (1..9).each_with_object({}) { |n, hash| hash[n] = INITIAL_MARKER }
 end
@@ -73,6 +89,8 @@ end
 def set_board_at!(brd, position, val)
   brd[position] = val
 end
+
+# Predicates
 
 def diagonal_at_0?(sqr)
   diagonal0 = [1, 5, 9]
@@ -92,10 +110,14 @@ def computer_one_move_left?(ar)
   ar.count(COMPUTER_MARKER) == 2
 end
 
+# return true if all values in vals
+# are the string PLAYER_MARKER
 def all_player?(vals)
   vals.all? { |val| val == PLAYER_MARKER }
 end
 
+# return true if all values in vals
+# are the string COMPUTER_MARKER
 def all_computer?(vals)
   vals.all? { |val| val == COMPUTER_MARKER }
 end
@@ -124,21 +146,7 @@ def game?(scores)
   !winner.empty?
 end
 
-def play_again?(y_n)
-  will_play = true
-  loop do
-    answer = y_n.downcase
-    if answer == 'n' || answer == 'y'
-      will_play = false if y_n == 'n'
-      break
-    else
-      prompt "Sorry #{y_n} is not a valid answer"
-      prompt "Enter y if you want to play again otherwise enter n."
-      y_n = gets.chomp
-    end
-  end
-  will_play
-end
+# Display helpers string manipulation and prompt
 
 def display_board(brd)
   row_line = '-----+-----+-----'
@@ -171,7 +179,9 @@ def display_end_game(winner)
   msg = { computer: 'Computer Won a game!', player: 'You won a game!' }
   message_key = winner.keys[0]
   prompt msg[message_key]
-  prompt('Play a new game? (y / n)')
+  prompt('Play a new game?')
+  prompt 'Please enter y if you want to play a new game.'
+  prompt 'Or enter any key end the game.'
 end
 
 def display_end_turn(winner_or_tie)
@@ -181,7 +191,9 @@ def display_end_turn(winner_or_tie)
     tie: 'It is a tie!'
   }
   prompt messages[winner_or_tie]
-  prompt('Play again? (y / n)')
+  prompt('Play again?')
+  prompt 'Please enter y if you want to play again.'
+  prompt 'Or enter any key if you want to quit.'
 end
 
 def prompt(msg)
@@ -202,6 +214,12 @@ def joinor(ar, separator=', ', and_or='or')
   end
 end
 
+# Computer AI in the game helpers
+
+# return a square from board
+# if there is a column or a row
+# where there are two PLAYER_MARKER
+# else nil
 def defend_by_column_row(brd)
   empty_squares = empty_in_board(brd).keys
   empty_squares.each do |sqr_num|
@@ -209,13 +227,16 @@ def defend_by_column_row(brd)
     col = square_to_column(sqr_num)
     row_vals = values_at_row(brd, row)
     col_vals = values_at_col(brd, col)
-    if player_one_move_left?(row_vals) || player_one_move_left?(col_vals)
-      return sqr_num
-    end
+    is_threat = player_one_move_left?(row_vals) ||
+                player_one_move_left?(col_vals)
+    return sqr_num if is_threat
   end
   nil
 end
 
+# return a square from board
+# if there is a diagonal  where there are two PLAYER_MARKER
+# else nil
 def defend_by_diagonal(brd)
   empty_squares = empty_in_board(brd).keys
   empty_squares.each do |sqr_num|
@@ -231,6 +252,10 @@ def defend_by_diagonal(brd)
   nil
 end
 
+# return a square from board
+# if there is a column  or a row
+# where there are two COMPUTER_MARKER
+# else nil
 def computer_winning_col_row(brd)
   empty_squares = empty_in_board(brd).keys
   empty_squares.each do |sqr_num|
@@ -244,6 +269,9 @@ def computer_winning_col_row(brd)
   nil
 end
 
+# return a square from board
+# if there is a diagonal  where there are two COMPUTER_MARKER
+# else nil
 def computer_winning_digonal(brd)
   empty_squares = empty_in_board(brd).keys
   empty_squares.each do |sqr_num|
@@ -272,6 +300,8 @@ def corner_or_five_or_random(brd)
   end
 end
 
+# Logic for choosing the first player helpers
+
 def choose_player
   player = ''
   loop do
@@ -290,6 +320,8 @@ def initialize_player(current_player)
   current_player == 'choose' ? choose_player : FIRST_PLAYER
 end
 
+# Computer moves
+
 def computer_places_piece!(brd)
   computer_choice = computer_winning_col_row(brd)
   computer_choice ||= computer_winning_digonal(brd)
@@ -298,6 +330,8 @@ def computer_places_piece!(brd)
   computer_choice ||= corner_or_five_or_random(brd)
   set_board_at!(brd, computer_choice, COMPUTER_MARKER)
 end
+
+# Player moves
 
 def player_places_piece!(brd)
   square = nil
@@ -313,6 +347,8 @@ def player_places_piece!(brd)
   set_board_at!(brd, square, PLAYER_MARKER)
 end
 
+# Player and Computer dinamic dispatch
+
 def place_piece!(brd, player)
   return player_places_piece!(brd) if player == :player
   computer_places_piece!(brd)
@@ -321,6 +357,8 @@ end
 def alternate_player(current_player)
   current_player == :player ? :computer : :player
 end
+
+# Inside main game helpers
 
 def end_game_or_turn(scores, winner_or_tie)
   if game?(scores)
@@ -336,41 +374,46 @@ def scored_five(scores)
   scores.select { |k, v| (k == :computer || k == :player) && v == 5 }
 end
 
-if __FILE__ == $PROGRAM_NAME
+# Turn inside a game
 
-  scores = Hash.new { 0 }
+def play_turn(board, scores, current_player)
   loop do
-    system('clear') || system('cls')
-    board = initialize_board
-    current_player = initialize_player(FIRST_PLAYER)
-    winner_or_tie = :tie
-
-    loop do
-      system('clear') || system('cls')
-      display_board(board)
-      place_piece!(board, current_player)
-      if someone_won?(board)
-        scores[current_player] += 1
-        winner_or_tie = current_player
-        break
-      end
-      break if board_full?(board)
-      current_player = alternate_player(current_player)
-    end
-
+    # clear screen and display board inside the turn
     system('clear') || system('cls')
     display_board(board)
-    display_scores(scores)
-
-    if game?(scores)
-      display_end_game(scored_five(scores))
-      scores = Hash.new { 0 }
-    else
-      display_end_turn(winner_or_tie)
+    place_piece!(board, current_player)
+    if someone_won?(board)
+      scores[current_player] += 1
+      return current_player
     end
+    if board_full?(board)
+      return :tie
+    end
+    current_player = alternate_player(current_player)
+  end
+end
+
+# Main loop game
+
+def play_game
+  scores = Hash.new { 0 }
+  system('clear') || system('cls')
+  loop do
+    board = initialize_board
+    current_player = initialize_player(FIRST_PLAYER)
+    winner_or_tie = play_turn(board, scores, current_player)
+    # clear screen and display board after a turn
+    system('clear') || system('cls')
+    display_board(board)
+
+    display_scores(scores)
+    scores = end_game_or_turn(scores, winner_or_tie)
     answer = gets.chomp
-    break unless play_again?(answer)
+    break unless answer.downcase == 'y'
   end
   prompt "Thanks for playing Tic Tac Toe"
+end
 
+if __FILE__ == $PROGRAM_NAME
+  play_game
 end
