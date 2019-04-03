@@ -322,20 +322,6 @@ def alternate_player(current_player)
   current_player == :player ? :computer : :player
 end
 
-def end_game_or_turn(scores, winner_or_tie)
-  if game?(scores)
-    display_end_game(scored_five(scores))
-    scores = Hash.new { 0 }
-  else
-    display_end_turn(winner_or_tie)
-  end
-  scores
-end
-
-def scored_five(scores)
-  scores.select { |k, v| (k == :computer || k == :player) && v == 5 }
-end
-
 if __FILE__ == $PROGRAM_NAME
 
   scores = Hash.new { 0 }
