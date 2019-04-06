@@ -19,12 +19,19 @@ def initilize_deck
   deck
 end
 
-def add_card!(deck, player_cards)
+def add_card!(deck, player_cards, players_total, player)
   player_cards << deck.pop
+  players_total[player] = player_cards_sum(player_cards)
 end
 
-def start_player_cards!(deck, player_cards)
-  FIRST_TURN_CRDS.times { |_| add_card!(deck, player_cards) }
+def player_cards_total(players_total, player)
+  players_total[player]
+end
+
+def start_player_cards!(deck, player_cards, players_total, player)
+  FIRST_TURN_CRDS.times do |_|
+    add_card!(deck, player_cards, players_total, player)
+  end
 end
 
 def display_turn_cards(user:, dealer:)
@@ -68,8 +75,8 @@ def retrieve_hit_stay_answer
   answer.downcase
 end
 
-def player_busted?(player_cards)
-  player_cards_sum(player_cards) > WIN_VAL
+def player_busted?(players_total, player)
+  player_cards_total(players_total, player) > WIN_VAL
 end
 
 def player_cards_sum(player_cards)
@@ -99,15 +106,15 @@ def cards_values(ranks)
   end
 end
 
-def player_hit!(deck, player_cards)
-  add_card!(deck, player_cards)
+def player_hit!(deck, player_cards, players_total, player)
+  add_card!(deck, player_cards, players_total, player)
 end
 
-def display_game_result(user_cards, dealer_cards)
+def display_game_result(user_cards, dealer_cards, players_total, user, dealer)
   display_cards(user_cards, introduce: 'You have ', new_line: "")
-  display_scores(user_cards, introduce: ' and you scored ')
+  display_scores(players_total, user, introduce: ' and you scored ')
   display_cards(dealer_cards, introduce: 'Dealer has ', new_line: "")
-  display_scores(dealer_cards, introduce: ' and  scored ')
+  display_scores(players_total, dealer, introduce: ' and  scored ')
 end
 
 def display_winner_21(winner, user_scores, dealer_scores)
@@ -139,9 +146,9 @@ def display_cards(cards, introduce: '', new_line: "\n")
   display_message(introduce + joinor(cards), new_line: new_line)
 end
 
-def display_scores(cards, introduce: "", new_line: "\n")
-  cards = player_cards_sum(cards).to_s
-  print(introduce + cards + new_line)
+def display_scores(players_total, player, introduce: "", new_line: "\n")
+  scores = player_cards_total(players_total, player).to_s
+  print(introduce + scores + new_line)
 end
 
 def card_to_s(card)
@@ -181,76 +188,89 @@ def display_welcome
   display_message "Hello, welcome to Twenty-One."
 end
 
-def scored_21?(player_cards)
-  player_cards_sum(player_cards) == 21
+def scored_21?(players_total, player)
+  player_cards_total(players_total, player) == 21
 end
 
 if __FILE__ == $PROGRAM_NAME
   welcome = true
+  players_round = Hash.new(0)
   loop do
     system('clear') || system('cls')
     display_welcome if welcome
     welcome = false
     user_cards = []
     dealer_cards = []
+    players_total = Hash.new(0)
 
     deck = initilize_deck.shuffle
 
     dealer = PLAYERS[0]
     user = PLAYERS[1]
 
-    start_player_cards!(deck, user_cards)
-    start_player_cards!(deck, dealer_cards)
+    start_player_cards!(deck, user_cards, players_total, user)
+    start_player_cards!(deck, dealer_cards, players_total, dealer)
     winner21 = nil
 
     loop do
-      break if scored_21?(user_cards)
+      break if scored_21?(players_total, user)
       display_turn_cards(user: user_cards, dealer: dealer_cards)
       answer = retrieve_hit_stay_answer
       break if user_saty?(answer)
-      player_hit!(deck, user_cards)
-      break if player_busted?(user_cards)
+      player_hit!(deck, user_cards, players_total, user)
+      break if player_busted?(players_total, user)
     end
 
     busted = nil
-    if player_busted?(user_cards)
+    if player_busted?(players_total, user)
       busted = user
-    elsif scored_21?(user_cards)
+    elsif scored_21?(players_total, user)
       winner21 = user
     else
       display_message "You stayed, It's dealer time!'"
       loop do
-        if player_cards_sum(dealer_cards) > DEALER_STOP ||
-           player_busted?(dealer_cards) ||
-           scored_21?(dealer_cards)
+        if player_cards_total(players_total, dealer) > DEALER_STOP ||
+           player_busted?(players_total, dealer) ||
+           scored_21?(players_total, dealer)
           break
         else
           display_message "Dealer hit!"
-          player_hit!(deck, dealer_cards)
+          player_hit!(deck, dealer_cards, players_total, dealer)
           sleep(1)
           dl_cards = joinor(dealer_cards[1..-1], ', ', '')
           display_message("Dealer has now: #{dl_cards} and unkown")
           sleep(2)
         end
       end
-      busted = dealer if player_busted?(dealer_cards)
-      winner21 = dealer if scored_21?(dealer_cards)
+      busted = dealer if player_busted?(players_total, dealer)
+      winner21 = dealer if scored_21?(players_total, dealer)
       unless busted || winner21
         sleep(0.5)
         display_message('Dealer stays.')
       end
     end
 
-    display_game_result(user_cards, dealer_cards)
-    user_scores = player_cards_sum(user_cards)
-    dealer_scores = player_cards_sum(dealer_cards)
+    display_game_result(user_cards, dealer_cards, players_total, user, dealer)
+    user_scores = player_cards_total(players_total, user)
+    dealer_scores = player_cards_total(players_total, dealer)
     unless winner21 || busted
       turn_winner = user_scores > dealer_scores ? user : dealer
-      display_winner(turn_winner) unless user_scores == dealer_scores
+      unless user_scores == dealer_scores
+        display_winner(turn_winner)
+        players_round[turn_winner] += 1
+      end
       display_tie if user_scores == dealer_scores
     end
-    display_winner_21(winner21, user_scores, dealer_scores) if winner21
-    display_busted(busted) if busted
+    if winner21
+      players_round[winner21] += 1
+      display_winner_21(winner21, user_scores, dealer_scores)
+    end
+    if busted
+      display_busted(busted)
+      winner = busted == :dealer ? :user : :dealer
+      players_round[winner] += 1
+    end
+    puts players_round
 
     answer = retrieve_play_again_answer
     break unless play_again?(answer)
