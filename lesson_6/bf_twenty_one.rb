@@ -10,7 +10,7 @@ PLAYERS = [:dealer, :user]
 FIRST_TURN_CRDS = 2
 WIN_VAL = 21
 DEALER_STOP = 17
-
+GAME = 5
 def initilize_deck
   deck = []
   SUITS.each do |suit|
@@ -169,6 +169,32 @@ def play_again?(answer)
   answer == 'y'
 end
 
+def game_winner(players_round)
+  game_winner = nil
+  scored_five = players_round.select { |_, score| score == GAME }
+  unless scored_five.empty?
+    game_winner = scored_five.keys[0]
+    game_winner = game_winner == :dealer ? 'Dealer' : 'You'
+  end
+  game_winner
+end
+
+def retrieve_another_game_answer(gm_winner)
+  display_message "#{gm_winner} won #{GAME} rounds."
+  display_message "Do you want to play another game? (y / n)"
+  answer = gets.chomp
+  loop do
+    if answer.downcase == 'n' || answer.downcase == 'y'
+      break
+    else
+      display_message "Sorry #{answer} is not a valid choise."
+      display_message "Enter y if you want to play again otherwise enter n."
+      answer = gets.chomp
+    end
+  end
+  answer.downcase
+end
+
 def retrieve_play_again_answer
   display_message "Do you want to play again? (y / n)"
   answer = gets.chomp
@@ -270,9 +296,14 @@ if __FILE__ == $PROGRAM_NAME
       winner = busted == :dealer ? :user : :dealer
       players_round[winner] += 1
     end
-    puts players_round
 
-    answer = retrieve_play_again_answer
+    g_winner = game_winner(players_round)
+    answer = if g_winner
+               players_round = Hash.new(0)
+               retrieve_another_game_answer(g_winner)
+             else
+               retrieve_play_again_answer
+             end
     break unless play_again?(answer)
   end
   display_message "Thank you for playing Twenty-One"
