@@ -112,11 +112,6 @@ def display_players_cards(user_cards, dealer_cards)
   display_scores(dealer_cards, introduce: ' and scored ')
 end
 
-def display_winner_21(winner)
-  winner = winner == :dealer ? 'Dealer' : 'You'
-  display_message "#{winner} reached 21 and won!"
-end
-
 def display_busted(busted)
   busted = busted == :dealer ? 'Dealer' : 'You'
   winner = busted == 'Dealer' ? 'You' : 'Dealer'
