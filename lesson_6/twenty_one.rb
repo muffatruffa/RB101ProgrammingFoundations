@@ -210,9 +210,9 @@ def retrieve_result(user_cards, dealer_cards, user, dealer)
   res = Hash.new
   user_scores = player_cards_sum(user_cards)
   dealer_scores = player_cards_sum(dealer_cards)
-  if user_scores > 21
+  if player_busted?(user_cards)
     res[:busted] = user
-  elsif dealer_scores > 21
+  elsif player_busted?(dealer_cards)
     res[:busted] = dealer
   elsif dealer_scores < user_scores
     res[:winner] = user
