@@ -1,3 +1,4 @@
+
 # A Deck is an array of all cards
 # a card is a two element array first represent the suit second the rank
 # a card rank is an integer form 1 to 13
@@ -11,6 +12,8 @@ FIRST_TURN_CRDS = 2
 WIN_VAL = 21
 DEALER_STOP = 17
 GAME = 5
+
+
 def initilize_deck
   deck = []
   SUITS.each do |suit|
@@ -59,11 +62,12 @@ def joinor(cards, separator=', ', and_or='and')
   end
 end
 
-def user_saty?(answer)
+def user_stay?(answer)
   answer == 's'
 end
 
 def retrieve_hit_stay_answer
+  puts
   display_message 'Stay or Hit? (s / h)'
   answer = gets.chomp
   loop do
@@ -110,21 +114,12 @@ def player_hit!(deck, player_cards, players_total, player)
   add_card!(deck, player_cards, players_total, player)
 end
 
-def display_game_result(user_cards, dealer_cards, players_total, user, dealer)
+def display_players_cards(user_cards, dealer_cards)
+  puts
   display_cards(user_cards, introduce: 'You have ', new_line: "")
-  display_scores(players_total, user, introduce: ' and you scored ')
+  display_scores(user_cards, introduce: ' and you scored ')
   display_cards(dealer_cards, introduce: 'Dealer has ', new_line: "")
-  display_scores(players_total, dealer, introduce: ' and  scored ')
-end
-
-def display_winner_21(winner, user_scores, dealer_scores)
-  if user_scores == dealer_scores
-    display_message "Both players reached 21."
-    display_tie
-  else
-    winner = winner == :dealer ? 'Dealer' : 'You'
-    display_message "#{winner} reached 21 and won!"
-  end
+  display_scores(dealer_cards, introduce: ' and scored ')
 end
 
 def display_busted(busted)
@@ -146,9 +141,9 @@ def display_cards(cards, introduce: '', new_line: "\n")
   display_message(introduce + joinor(cards), new_line: new_line)
 end
 
-def display_scores(players_total, player, introduce: "", new_line: "\n")
-  scores = player_cards_total(players_total, player).to_s
-  print(introduce + scores + new_line)
+def display_scores(cards, introduce: "", new_line: "\n")
+  cards = player_cards_sum(cards).to_s
+  print(introduce + cards + new_line)
 end
 
 def card_to_s(card)
@@ -196,6 +191,7 @@ def retrieve_another_game_answer(gm_winner)
 end
 
 def retrieve_play_again_answer
+  puts
   display_message "Do you want to play again? (y / n)"
   answer = gets.chomp
   loop do
@@ -212,10 +208,74 @@ end
 
 def display_welcome
   display_message "Hello, welcome to Twenty-One."
+  display_message 'Evry 5 round a player win he/she win a game.'
 end
 
 def scored_21?(players_total, player)
   player_cards_total(players_total, player) == 21
+end
+
+def user_turn(user_cards, dealer_cards, deck, players_total, user)
+  loop do
+    break if scored_21?(players_total, user)
+    display_turn_cards(user: user_cards, dealer: dealer_cards)
+    answer = retrieve_hit_stay_answer
+    break if user_stay?(answer)
+    player_hit!(deck, user_cards, players_total, user)
+    break if player_busted?(players_total, user)
+  end
+end
+
+def dealer_turn(dealer_cards, deck, players_total, dealer)
+  loop do
+    break if player_busted?(players_total, dealer)
+    break if scored_21?(players_total, dealer)
+    if player_cards_total(players_total, dealer) > DEALER_STOP
+      display_message('Dealer stays.')
+      break
+    end
+    display_message "Dealer hit!"
+    player_hit!(deck, dealer_cards, players_total, dealer)
+    sleep(1)
+    dl_cards = joinor(dealer_cards[1..-1], ', ', '')
+    display_message("Dealer has now: #{dl_cards} and unkown")
+    sleep(1)
+  end
+end
+
+def retrieve_result(user_cards, dealer_cards, user, dealer)
+  res = Hash.new
+  user_scores = player_cards_sum(user_cards)
+  dealer_scores = player_cards_sum(dealer_cards)
+  if user_scores > 21
+    res[:busted] = user
+  elsif dealer_scores > 21
+    res[:busted] = dealer
+  elsif dealer_scores < user_scores
+    res[:winner] = user
+  elsif dealer_scores > user_scores
+    res[:winner] = dealer
+  else
+    res[:tie] = :tie
+  end
+  res
+end
+
+def add_round_winner(round_res, players_round)
+  winner = nil
+  if round_res.has_key?(:busted)
+    winner = round_res[:busted] == :dealer ? :user : :dealer
+	end
+	winner = round_res[:winner] if round_res.has_key?(:winner)
+  players_round[winner] += 1 if winner
+end
+
+def display_end_result(res_hash)
+  case res_hash.keys[0]
+  when :busted then display_busted(res_hash[:busted])
+  when :tie then display_tie
+  else display_winner(res_hash[:winner])
+  end
 end
 
 if __FILE__ == $PROGRAM_NAME
@@ -225,77 +285,33 @@ if __FILE__ == $PROGRAM_NAME
     system('clear') || system('cls')
     display_welcome if welcome
     welcome = false
+
     user_cards = []
     dealer_cards = []
-    players_total = Hash.new(0)
-
     deck = initilize_deck.shuffle
-
     dealer = PLAYERS[0]
     user = PLAYERS[1]
+    players_total = Hash.new(0)
 
     start_player_cards!(deck, user_cards, players_total, user)
     start_player_cards!(deck, dealer_cards, players_total, dealer)
-    winner21 = nil
 
-    loop do
-      break if scored_21?(players_total, user)
-      display_turn_cards(user: user_cards, dealer: dealer_cards)
-      answer = retrieve_hit_stay_answer
-      break if user_saty?(answer)
-      player_hit!(deck, user_cards, players_total, user)
-      break if player_busted?(players_total, user)
+    if scored_21?(players_total, user) && scored_21?(players_total, dealer)
+      display_players_cards(user_cards, dealer_cards)
+      display_tie
     end
 
-    busted = nil
-    if player_busted?(players_total, user)
-      busted = user
-    elsif scored_21?(players_total, user)
-      winner21 = user
-    else
+    user_turn(user_cards, dealer_cards, deck, players_total, user)
+
+    unless player_busted?(players_total, user) || scored_21?(players_total, user)
       display_message "You stayed, It's dealer time!'"
-      loop do
-        if player_cards_total(players_total, dealer) > DEALER_STOP ||
-           player_busted?(players_total, dealer) ||
-           scored_21?(players_total, dealer)
-          break
-        else
-          display_message "Dealer hit!"
-          player_hit!(deck, dealer_cards, players_total, dealer)
-          sleep(1)
-          dl_cards = joinor(dealer_cards[1..-1], ', ', '')
-          display_message("Dealer has now: #{dl_cards} and unkown")
-          sleep(2)
-        end
-      end
-      busted = dealer if player_busted?(players_total, dealer)
-      winner21 = dealer if scored_21?(players_total, dealer)
-      unless busted || winner21
-        sleep(0.5)
-        display_message('Dealer stays.')
-      end
+      dealer_turn(dealer_cards, deck, players_total, dealer)
     end
 
-    display_game_result(user_cards, dealer_cards, players_total, user, dealer)
-    user_scores = player_cards_total(players_total, user)
-    dealer_scores = player_cards_total(players_total, dealer)
-    unless winner21 || busted
-      turn_winner = user_scores > dealer_scores ? user : dealer
-      unless user_scores == dealer_scores
-        display_winner(turn_winner)
-        players_round[turn_winner] += 1
-      end
-      display_tie if user_scores == dealer_scores
-    end
-    if winner21
-      players_round[winner21] += 1
-      display_winner_21(winner21, user_scores, dealer_scores)
-    end
-    if busted
-      display_busted(busted)
-      winner = busted == :dealer ? :user : :dealer
-      players_round[winner] += 1
-    end
+    round_result = retrieve_result(user_cards, dealer_cards, user, dealer)
+    add_round_winner(round_result, players_round)
+    display_players_cards(user_cards, dealer_cards)
+    display_end_result(round_result)
 
     g_winner = game_winner(players_round)
     answer = if g_winner
